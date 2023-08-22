@@ -5,7 +5,7 @@ WITH test_info AS
 SELECT
   1101 AS ab_test_id,
   2457 AS control,
-  2519 AS experiment
+  2519 AS experiment  
 ),
 
 uncapped_downfunnel_per_auction AS
@@ -13,7 +13,7 @@ uncapped_downfunnel_per_auction AS
 	    COALESCE(install__ad_click__impression__auction_id,
 	             reeng_click__impression__auction_id,
 	             attribution_event__click__impression__auction_id) AS auction_id
-	  , CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(COALESCE(install__ad_click__impression__at, reeng_click__impression__at, attribution_event__click__impression__at)/1000, 'UTC'))),1,19),'Z') as impression_at
+	  , CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(COALESCE(install__ad_click__impression__at, reeng_click__impression__at, attribution_event__click__impression__at)/1000, 'UTC'))),1,19),'Z') as impression_at 
 	  , "group".id AS ab_test_group_id
 	  , "group".name AS ab_test_group_name
 	  , COALESCE(install__ad_click__impression__bid__bid_request__exchange,
@@ -83,7 +83,7 @@ uncapped_downfunnel_per_auction AS
 	  		AND at - COALESCE(install__ad_click__impression__at, reeng_click__impression__at, attribution_event__click__impression__at) < 604800000	
 	  		,1,0)) AS target_events_d7
 	  , SUM(if(at - COALESCE(install__ad_click__impression__at, reeng_click__impression__at, attribution_event__click__impression__at) < 604800000
-	  		,customer_revenue_micros, 0)) AS customer_revenue_micros _d7
+	  		,customer_revenue_micros, 0)) AS customer_revenue_micros_d7
 	  , SUM(if(custom_event_id = COALESCE(install__ad_click__impression__bid__campaign_target_event_id,reeng_click__impression__bid__campaign_target_event_id,attribution_event__click__impression__bid__campaign_target_event_id)
 	        AND first_occurrence
 	        AND at - COALESCE(install__ad_click__impression__at, reeng_click__impression__at, attribution_event__click__impression__at) < 604800000
@@ -99,7 +99,7 @@ uncapped_downfunnel_per_auction AS
 	  AND is_uncredited <> true
 	  AND for_reporting = true
 	  AND t.id = (SELECT ab_test_id FROM test_info)
-	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 	),
 
 funnel AS (
@@ -111,7 +111,7 @@ funnel AS (
 	  , customer_id AS customer_id
 	  , app_id AS dest_app_id
 	  , campaign_id AS campaign_id
-	  , CASE WHEN bid_request__device__geo__country) IN 
+	  , CASE WHEN bid_request__device__geo__country IN 
 	  			('ZA','KE','AE','SA','BH','KW','OM','QA','LB','JO','SY','IQ','IR','IL','PS','CY','YE',
 	  				'EG','TR','AZ','AM','GE','KZ','UZ','TM','AF','PK','KG','TJ','SG','ID','MY','KR','TW','HK','PH','TH','VN') THEN 'asia pacific'
 	  		 WHEN bid_request__device__geo__country IN ('US','GB','IN','JP','BR') THEN bid_request__device__geo__country
@@ -148,7 +148,7 @@ funnel AS (
 	CROSS JOIN UNNEST(bid_request__ab_test_assignments) t	
 	WHERE dt >= '{{ dt }}' AND dt < '{{ dt_add(dt, hours=1) }}'
 	AND t.id = (SELECT ab_test_id FROM test_info)
-	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 
 UNION ALL 
 
@@ -160,7 +160,7 @@ UNION ALL
 	  , bid__customer_id AS customer_id
 	  , bid__app_id AS dest_app_id
 	  , bid__campaign_id AS campaign_id
-	  , CASE WHEN bid__bid_request__device__geo__country) IN 
+	  , CASE WHEN bid__bid_request__device__geo__country IN 
 	  			('ZA','KE','AE','SA','BH','KW','OM','QA','LB','JO','SY','IQ','IR','IL','PS','CY','YE',
 	  				'EG','TR','AZ','AM','GE','KZ','UZ','TM','AF','PK','KG','TJ','SG','ID','MY','KR','TW','HK','PH','TH','VN') THEN 'asia pacific'
 	  		 WHEN bid__bid_request__device__geo__country IN ('US','GB','IN','JP','BR') THEN bid__bid_request__device__geo__country
@@ -171,7 +171,6 @@ UNION ALL
 	  , bid__ad_group_type AS ad_group_type
 	  , bid__price_data__model_type AS model_type
 	  , bid__exploratory AS is_exploratory
-	  , bid__bid_request__impressions[1].traffic_type AS traffic_type
 	  , CASE WHEN bid__creative__ad_format = 'video' THEN 'VAST'
 	        WHEN bid__creative__ad_format = 'native' THEN 'native'
 	        WHEN bid__creative__ad_format in ('320x50', '728x90') THEN 'banner'
@@ -209,7 +208,7 @@ UNION ALL
 	CROSS JOIN UNNEST(bid__bid_request__ab_test_assignments) t
 	WHERE dt >= '{{ dt }}' AND dt < '{{ dt_add(dt, hours=1) }}'
 	   AND t.id = (SELECT ab_test_id FROM test_info)
-	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 
 UNION ALL 
 
@@ -221,7 +220,7 @@ UNION ALL
 	  , ad_click__impression__bid__customer_id AS customer_id
 	  , ad_click__impression__bid__app_id AS dest_app_id
 	  , ad_click__impression__bid__campaign_id AS campaign_id
-	  , CASE WHEN ad_click__impression__bid__bid_request__device__geo__country) IN 
+	  , CASE WHEN ad_click__impression__bid__bid_request__device__geo__country IN 
 	  			('ZA','KE','AE','SA','BH','KW','OM','QA','LB','JO','SY','IQ','IR','IL','PS','CY','YE',
 	  				'EG','TR','AZ','AM','GE','KZ','UZ','TM','AF','PK','KG','TJ','SG','ID','MY','KR','TW','HK','PH','TH','VN') THEN 'asia pacific'
 	  		 WHEN ad_click__impression__bid__bid_request__device__geo__country IN ('US','GB','IN','JP','BR') THEN ad_click__impression__bid__bid_request__device__geo__country
@@ -261,7 +260,7 @@ UNION ALL
 	  AND is_uncredited <> true
 	  AND for_reporting = true
 	  AND t.id = (SELECT ab_test_id FROM test_info)
-	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 
 UNION ALL 
 
@@ -292,35 +291,35 @@ UNION ALL
 	  , SUM(customer_revenue_micros_d7) AS customer_revenue_micros_d7 
 	  , SUM(target_events_first_d7) AS target_events_first_d7
 	  , SUM(LEAST(customer_revenue_micros_d7,500000000)) AS capped_customer_revenue_micros_d7
-	  , SUM(POWER(LEAST(CAST(customer_revenue_micros_d7 AS double)/1e6,500),2)) AS squared_capped_customer_revenue_7
+	  , SUM(POWER(LEAST(CAST(customer_revenue_micros_d7 AS double)/1e6,500),2)) AS squared_capped_customer_revenue_d7
 	  , SUM(0) AS expected_val
 	  , SUM(0) AS bids
 	  , SUM(0) AS aovx_nr_micros
-	FROM uncapped_rev_per_auction u
-	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+	FROM uncapped_downfunnel_per_auction u
+	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 )
 
 SELECT
-    impression_at
-  , ab_test_group_id
-  , ab_test_group_name
-  , exchange
-  , customer_id
-  , dest_app_id
-  , campaign_id
-  , country_grouped
-  , non_personalized
-  , is_viewthrough
-  , platform
-  , ad_group_type
-  , model_type
-  , is_exploratory
-  , ad_format
-  , campaign_tracker_type
-  , auction_type
-  , spend_based_ab_test_group
-  , t2.compay AS customer_name 
-  , t3.name AS dest_app_name 
+    t1.impression_at
+  , t1.ab_test_group_id
+  , t1.ab_test_group_name
+  , t1.exchange
+  , t1.customer_id
+  , t1.dest_app_id
+  , t1.campaign_id
+  , t1.country_grouped
+  , t1.non_personalized
+  , t1.is_viewthrough
+  , t1.platform
+  , t1.ad_group_type
+  , t1.model_type
+  , t1.is_exploratory
+  , t1.ad_format
+  , t1.campaign_tracker_type
+  , t1.auction_type
+  , t1.spend_based_ab_test_group
+  , t2.company AS customer_name 
+  , t3.display_name AS dest_app_name 
   , t4.display_name AS campaign_name
   , t4.salesforce_campaign_id as salesforce_campaign_id   
   , SUM(impressions) AS impressions
@@ -331,7 +330,7 @@ SELECT
   , SUM(customer_revenue_micros_d7) AS customer_revenue_micros_d7 
   , SUM(target_events_first_d7) AS target_events_first_d7
   , SUM(capped_customer_revenue_micros_d7) AS capped_customer_revenue_micros_d7
-  , SUM(squared_capped_customer_revenue_7) AS squared_capped_customer_revenue_7
+  , SUM(squared_capped_customer_revenue_d7) AS squared_capped_customer_revenue_d7
   , SUM(expected_val) AS expected_val
   , SUM(bids) AS bids
   , SUM(aovx_nr_micros) AS aovx_nr_micros
@@ -342,4 +341,4 @@ LEFT JOIN pinpoint.public.apps t3
   on t1.dest_app_id = t3.id
 LEFT JOIN pinpoint.public.campaigns t4
   on t1.campaign_id = t4.id
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
