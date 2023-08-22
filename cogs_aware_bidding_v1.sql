@@ -14,9 +14,6 @@ uncapped_downfunnel_per_auction AS
 	             reeng_click__impression__auction_id,
 	             attribution_event__click__impression__auction_id) AS auction_id
 	  , CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(COALESCE(install__ad_click__impression__at, reeng_click__impression__at, attribution_event__click__impression__at)/1000, 'UTC'))),1,19),'Z') as impression_at
-	  , CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(COALESCE(install__ad_click__at, reeng_click__at, attribution_event__click__at)/1000, 'UTC'))),1,19),'Z') as click_at
-	  , CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(install__at/1000, 'UTC'))),1,19),'Z') AS install_at
-	  , CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(event_timestamp/1000, 'UTC'))),1,19),'Z') AS at  
 	  , "group".id AS ab_test_group_id
 	  , "group".name AS ab_test_group_name
 	  , COALESCE(install__ad_click__impression__bid__bid_request__exchange,
@@ -108,9 +105,6 @@ uncapped_downfunnel_per_auction AS
 funnel AS (
 	SELECT
 	   NULL AS impression_at
-	  , NULL AS click_at 
-	  , NULL AS install_at
-	  , CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(at/1000, 'UTC'))),1,19),'Z') AS at
 	  , "group".id AS ab_test_group_id
 	  , "group".name AS ab_test_group_name
 	  , bid_request__exchange AS exchange
@@ -160,9 +154,6 @@ UNION ALL
 
 	SELECT
 	    CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(at/1000, 'UTC'))),1,19),'Z') AS impression_at
-	  , NULL AS click_at
-	  , NULL AS install_at
-	  , CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(at/1000, 'UTC'))),1,19),'Z') AS at
 	  , "group".id AS ab_test_group_id
 	  , "group".name AS ab_test_group_name
 	  , bid__bid_request__exchange AS exchange
@@ -223,10 +214,7 @@ UNION ALL
 UNION ALL 
 
 	SELECT
-	    CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(ad_click__impression__at/1000, 'UTC'))),1,19),'Z') as impression_at
-	  , CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(ad_click__at/1000, 'UTC'))),1,19),'Z') as click_at
-	  , CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(event_timestamp/1000, 'UTC'))),1,19),'Z') as install_at
-	  , CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(event_timestamp/1000, 'UTC'))),1,19),'Z') AS at  
+	    CONCAT(SUBSTR(to_iso8601(date_trunc('hour', from_unixtime(ad_click__impression__at/1000, 'UTC'))),1,19),'Z') as impression_at 
 	  , "group".id AS ab_test_group_id
 	  , "group".name AS ab_test_group_name
 	  , ad_click__impression__bid__bid_request__exchange AS exchange
@@ -279,9 +267,6 @@ UNION ALL
 
 	select
 	    impression_at
-	  , click_at
-	  , install_at
-	  , at  
 	  , ab_test_group_id
 	  , ab_test_group_name
 	  , exchange
@@ -317,9 +302,6 @@ UNION ALL
 
 SELECT
     impression_at
-  , click_at
-  , install_at
-  , at  
   , ab_test_group_id
   , ab_test_group_name
   , exchange
