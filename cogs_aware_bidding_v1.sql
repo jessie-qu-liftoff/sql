@@ -5,7 +5,7 @@ WITH test_info AS
 SELECT
   1101 AS ab_test_id,
   2457 AS control,
-  2519 AS experiment,  
+  2519 AS experiment
 ),
 
 uncapped_downfunnel_per_auction AS
